@@ -11,7 +11,7 @@ file.each_line do |line|
   x, y = pos.split(',').map(&:to_i)
   lenX, lenY = size.split('x').map(&:to_i)
   maxX = [maxX, x + lenX].max
-  maxY = [maxY, x + lenY].max
+  maxY = [maxY, y + lenY].max
   arr.push({
     x1: x + 1,
     x2: x + lenX,
