@@ -1,91 +1,81 @@
-package main
+// package main
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"strconv"
-	"strings"
-)
+// import (
+// 	"bufio"
+// 	"fmt"
+// 	"os"
+// 	"strconv"
+// 	"strings"
+// )
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
+// type position struct {
+// 	x1 int
+// 	x2 int
+// 	y1 int
+// 	y2 int
+// }
 
-type person struct {
-	x1 int
-	x2 int
-	y1 int
-	y2 int
-}
+// var mem map[string]bool = make(map[string]bool)
 
-func main() {
-	file, _ := os.Open("input.txt")
-	// file, _ := os.Open("sample.txt")
+// func intersectArea(rec1, rec2 position) int {
+// 	area := 0
+// 	for x := rec1.x1; x <= rec1.x2; x++ {
+// 		for y := rec1.y1; y <= rec1.y2; y++ {
+// 			if rec2.x1 <= x && x <= rec2.x2 && rec2.y1 <= y && y <= rec2.y2 {
+// 				k := strconv.Itoa(x) + "," + strconv.Itoa(y)
+// 				if _, ok := mem[k]; !ok {
+// 					area++
+// 				}
+// 				mem[k] = true
+// 			}
+// 		}
+// 	}
+// 	return area
+// }
 
-	defer file.Close()
+// func main() {
+// 	file, _ := os.Open("input.txt")
+// 	// file, _ := os.Open("sample.txt")
 
-	scanner := bufio.NewScanner(file)
+// 	defer file.Close()
 
-	var input []string
+// 	scanner := bufio.NewScanner(file)
 
-	var arr []person
+// 	var input []string
 
-	for scanner.Scan() {
-		input = append(input, scanner.Text())
-	}
+// 	var arr []position
 
-	maxX := -1
-	maxY := -1
+// 	for scanner.Scan() {
+// 		input = append(input, scanner.Text())
+// 	}
 
-	for i := 0; i < len(input); i++ {
-		r := strings.Split(input[i], "@ ")
-		ps := strings.Split(r[1], ": ")
-		xy := strings.Split(ps[0], ",")
-		len := strings.Split(ps[1], "x")
-		x, _ := strconv.Atoi(xy[0])
-		y, _ := strconv.Atoi(xy[1])
-		lenX, _ := strconv.Atoi(len[0])
-		lenY, _ := strconv.Atoi(len[1])
+// 	for i := 0; i < len(input); i++ {
+// 		r := strings.Split(input[i], "@ ")
+// 		ps := strings.Split(r[1], ": ")
+// 		xy := strings.Split(ps[0], ",")
+// 		len := strings.Split(ps[1], "x")
+// 		x, _ := strconv.Atoi(xy[0])
+// 		y, _ := strconv.Atoi(xy[1])
+// 		lenX, _ := strconv.Atoi(len[0])
+// 		lenY, _ := strconv.Atoi(len[1])
 
-		maxX = max(maxX, x+lenX)
-		maxY = max(maxY, y+lenY)
+// 		pos := position{
+// 			x1: (x + 1),
+// 			x2: (x + lenX),
+// 			y1: (y + 1),
+// 			y2: (y + lenY),
+// 		}
 
-		o := person{
-			x1: (x + 1),
-			x2: (x + lenX),
-			y1: (y + 1),
-			y2: (y + lenY),
-		}
+// 		arr = append(arr, pos)
+// 	}
 
-		arr = append(arr, o)
-	}
+// 	ans := 0
 
-	// fmt.Println(maxX)
-	// fmt.Println(maxY)
+// 	for i := 0; i < len(arr); i++ {
+// 		for j := i + 1; j < len(arr); j++ {
+// 			ans += intersectArea(arr[i], arr[j])
+// 		}
+// 	}
 
-	area := 0
-
-	for i := 1; i <= maxX; i++ {
-		for j := 1; j <= maxY; j++ {
-			count := 0
-
-			for k := 0; k < len(arr); k++ {
-				rec := arr[k]
-				if rec.x1 <= i && i <= rec.x2 && rec.y1 <= j && j <= rec.y2 {
-					count++
-				}
-
-				if count == 2 {
-					area++
-					break
-				}
-			}
-		}
-	}
-
-	fmt.Println(area)
-}
+// 	fmt.Println(ans)
+// }
