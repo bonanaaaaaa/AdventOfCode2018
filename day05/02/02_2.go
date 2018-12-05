@@ -4,8 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 )
+
+var minV = 999999999
 
 func match(s1, s2 string) bool {
 	return strings.ToLower(s1) == strings.ToLower(s2) && s1 != s2
@@ -47,6 +50,13 @@ func merge(front, back string) string {
 	}
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func main() {
 	file, _ := os.Open("input.txt")
 	// file, _ := os.Open("sample.txt")
@@ -61,9 +71,39 @@ func main() {
 		str = scanner.Text()
 	}
 
-	ch := make(chan string)
+	m := make(map[string]bool)
 
-	go produce(str, ch)
-	ans := <-ch
-	fmt.Println(len(ans))
+	for _, char := range str {
+		m[strings.ToLower(string(char))] = true
+	}
+
+	strList := make([]string, 0, len(m))
+	for k := range m {
+		r, _ := regexp.Compile("([" + strings.ToUpper(k) + k + "])")
+		s := r.ReplaceAllString(str, "")
+		strList = append(strList, s)
+	}
+	ch := make(chan string)
+	chInt := make(chan int)
+
+	// var wg sync.WaitGroup
+
+	// fmt.Println(len(strList))
+
+	go func() {
+		for _, s := range strList {
+			go produce(s, ch)
+			chInt <- len(<-ch)
+		}
+		close(ch)
+		close(chInt)
+	}()
+
+	for l := range chInt {
+		// fmt.Println(l)
+		minV = min(l, minV)
+	}
+
+	fmt.Println(minV)
+
 }
