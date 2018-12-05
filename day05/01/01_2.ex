@@ -1,16 +1,15 @@
 defmodule Logic do
   def match(c1, c2) do
-    regex = ~r/([A-Z][a-z]|[a-z][A-Z])/
-    String.downcase(c1) == String.downcase(c2) && String.match?(c1 <> c2, regex)
+    String.downcase(c1) == String.downcase(c2) && c1 != c2
   end
 
   def produce(str) do
     case String.length(str) do
       0 ->
-        ""
+        [""]
 
       1 ->
-        str
+        [str]
 
       n ->
         half = div(n, 2)
@@ -28,25 +27,25 @@ defmodule Logic do
     end
   end
 
-  defp first(s) do
-    case String.first(s) do
-      nil -> ""
-      x -> x
+  defp first(e) do
+    case Enum.take(e, 1) do
+      [] -> ""
+      [x] -> x
     end
   end
 
-  defp last(s) do
-    case String.last(s) do
-      nil -> ""
-      x -> x
+  defp last(e) do
+    case Enum.take(e, -1) do
+      [] -> ""
+      [x] -> x
     end
   end
 
   defp merge(front, back) do
     if match(last(front), first(back)) do
-      merge(String.slice(front, 0..-2), String.slice(back, 1..-1))
+      merge(Enum.slice(front, 0..-2), Enum.slice(back, 1..-1))
     else
-      front <> back
+      front ++ back
     end
   end
 end
@@ -58,5 +57,5 @@ end
 
 Logic.produce(str)
 # |> IO.inspect()
-|> String.length()
+|> Enum.count()
 |> IO.inspect()

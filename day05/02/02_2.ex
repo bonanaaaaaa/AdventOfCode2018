@@ -6,10 +6,10 @@ defmodule Logic do
   def produce(str) do
     case String.length(str) do
       0 ->
-        ""
+        [""]
 
       1 ->
-        str
+        [str]
 
       n ->
         half = div(n, 2)
@@ -27,25 +27,25 @@ defmodule Logic do
     end
   end
 
-  defp first(s) do
-    case String.first(s) do
-      nil -> ""
-      x -> x
+  defp first(e) do
+    case Enum.take(e, 1) do
+      [] -> ""
+      [x] -> x
     end
   end
 
-  defp last(s) do
-    case String.last(s) do
-      nil -> ""
-      x -> x
+  defp last(e) do
+    case Enum.take(e, -1) do
+      [] -> ""
+      [x] -> x
     end
   end
 
   defp merge(front, back) do
     if match(last(front), first(back)) do
-      merge(String.slice(front, 0..-2), String.slice(back, 1..-1))
+      merge(Enum.slice(front, 0..-2), Enum.slice(back, 1..-1))
     else
-      front <> back
+      Enum.concat(front, back)
     end
   end
 end
@@ -67,12 +67,10 @@ end)
 |> Enum.map(fn ch ->
   String.replace(str, ~r/[#{String.capitalize(ch)}#{ch}]/, "")
 end)
-|> Task.async_stream(
-  fn s ->
-    s |> Logic.produce() |> String.length()
-  end,
-  timeout: 10000
-)
+|> Task.async_stream(fn s ->
+  # s |> Logic.produce() |> String.length()
+  s |> Logic.produce() |> Enum.count()
+end)
 # |> Enum.map(fn s -> Task.async(Logic, :find, [s]) end)
 # |> Enum.map(fn t -> Task.await(t) end)
 |> Enum.reduce(min, fn {:ok, n}, min -> Enum.min([n, min]) end)
