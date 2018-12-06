@@ -1,6 +1,7 @@
 defmodule Logic do
   def match(c1, c2) do
-    String.downcase(c1) == String.downcase(c2) && c1 != c2
+    regex = ~r/([A-Z][a-z]|[a-z][A-Z])/
+    String.downcase(c1) == String.downcase(c2) && String.match?(c1 <> c2, regex)
   end
 
   def produce(str) do
@@ -27,25 +28,21 @@ defmodule Logic do
     end
   end
 
-  defp first(e) do
-    case Enum.take(e, 1) do
-      [] -> ""
-      [x] -> x
-    end
-  end
-
-  defp last(e) do
-    case Enum.take(e, -1) do
-      [] -> ""
-      [x] -> x
+  defp nil_to_blank(char) do
+    case char do
+      nil -> ""
+      char -> char
     end
   end
 
   defp merge(front, back) do
-    if match(last(front), first(back)) do
-      merge(Enum.slice(front, 0..-2), Enum.slice(back, 1..-1))
+    {f, f_list} = List.pop_at(front, -1)
+    {b, b_list} = List.pop_at(back, 0)
+
+    if match(nil_to_blank(f), nil_to_blank(b)) do
+      merge(f_list, b_list)
     else
-      Enum.concat(front, back)
+      front ++ back
     end
   end
 end
@@ -55,7 +52,7 @@ end
   |> Stream.map(&String.trim/1)
   |> Enum.to_list()
 
-min = String.length(str)
+min_val = String.length(str)
 
 str
 |> String.graphemes()
@@ -63,16 +60,11 @@ str
   Map.put(acc, String.downcase(ch), true)
 end)
 |> Map.keys()
-# |> IO.inspect()
 |> Enum.map(fn ch ->
   String.replace(str, ~r/[#{String.capitalize(ch)}#{ch}]/, "")
 end)
 |> Task.async_stream(fn s ->
-  # s |> Logic.produce() |> String.length()
   s |> Logic.produce() |> Enum.count()
 end)
-# |> Enum.map(fn s -> Task.async(Logic, :find, [s]) end)
-# |> Enum.map(fn t -> Task.await(t) end)
-|> Enum.reduce(min, fn {:ok, n}, min -> Enum.min([n, min]) end)
-# |> Enum.min_by(&(Logic.find(&1) |> String.length()))
+|> Enum.reduce(min_val, fn {:ok, n}, min -> Enum.min([n, min]) end)
 |> IO.inspect()
