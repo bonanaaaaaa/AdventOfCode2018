@@ -36,10 +36,7 @@ func topologicalSort(graph map[string][]string) string {
 		q = q[1:]
 		order += u
 
-		neighbor := []string{}
-		if val, ok := graph[u]; ok {
-			neighbor = val
-		}
+		neighbor := graph[u]
 
 		for _, n := range neighbor {
 			inDegree[n]--
@@ -63,17 +60,11 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	var input []string
+	graph := make(map[string][]string)
+	inputRegex := regexp.MustCompile("Step\\s([A-Z])[a-z\\s]+([A-Z])[a-z\\s]+\\.")
 
 	for scanner.Scan() {
-		input = append(input, scanner.Text())
-	}
-
-	inputRegex := regexp.MustCompile("Step\\s([A-Z])[a-z\\s]+([A-Z])[a-z\\s]+\\.")
-	var graph = make(map[string][]string)
-
-	for _, line := range input {
-		matches := inputRegex.FindStringSubmatch(line)
+		matches := inputRegex.FindStringSubmatch(scanner.Text())
 		parent, child := matches[1], matches[2]
 		graph[parent] = append(graph[parent], child)
 	}
