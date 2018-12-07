@@ -43,9 +43,6 @@ defmodule Logic do
     new_time_map =
       new_q |> Enum.reduce(time_map, fn k, m -> Map.update!(m, k, &(&1 - time_used)) end)
 
-    # Filter out the job that done at the same time
-    new_q2 = new_q |> Enum.filter(fn q -> Map.get(new_time_map, q) != 0 end)
-
     # Add task to avialable tasks queue
     new_avia_tasks =
       neighbor
@@ -53,7 +50,7 @@ defmodule Logic do
       |> Enum.concat(avia_tasks)
 
     # Add new task to q
-    {new_q3, new_avia_tasks2} = (new_q2 ++ new_avia_tasks) |> Enum.split(5)
+    {new_q3, new_avia_tasks2} = (new_q ++ new_avia_tasks) |> Enum.split(5)
 
     # find the job that will done next
     new_q4 =
