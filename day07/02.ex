@@ -25,36 +25,41 @@ defmodule Logic do
 
     {q1, avia_tasks} = q |> Enum.split(5)
 
-    cal(g, in_degree, time_map, q1, avia_tasks, 0)
+    cal(g, in_degree, time_map, q1, avia_tasks, 0, "")
   end
 
-  defp cal(_g, _in_degree, _time_map, [], [], time), do: time
+  defp cal(_g, _in_degree, _time_map, [], [], time, order), do: {time, order}
 
-  defp cal(g, in_degree, time_map, q, avia_tasks, ans) do
+  defp cal(g, in_degree, time_map, q, avia_tasks, time, order) do
     {u, new_q} = q |> List.pop_at(0)
     time_used = time_map |> Map.get(u)
-    new_ans = ans + time_used
+    new_time = time + time_used
+    new_order = order <> u
 
     neighbor = Map.get(g, u, {}) |> Tuple.to_list()
     new_in_degree = cal_in_degree(neighbor, in_degree)
 
+    # Calculate time when job `u` done
     new_time_map =
       new_q |> Enum.reduce(time_map, fn k, m -> Map.update!(m, k, &(&1 - time_used)) end)
 
+    # Filter out the job that done at the same time
     new_q2 = new_q |> Enum.filter(fn q -> Map.get(new_time_map, q) != 0 end)
 
+    # Add task to avialable tasks queue
     new_avia_tasks =
       neighbor
       |> Enum.filter(fn n -> Map.get(new_in_degree, n) == 0 end)
       |> Enum.concat(avia_tasks)
-      |> Enum.sort()
 
+    # Add new task to q
     {new_q3, new_avia_tasks2} = (new_q2 ++ new_avia_tasks) |> Enum.split(5)
 
+    # find the job that will done next
     new_q4 =
       new_q3 |> Enum.sort(fn a, b -> Map.get(new_time_map, a) < Map.get(new_time_map, b) end)
 
-    cal(g, new_in_degree, new_time_map, new_q4, new_avia_tasks2, new_ans)
+    cal(g, new_in_degree, new_time_map, new_q4, new_avia_tasks2, new_time, new_order)
   end
 
   defp cal_in_degree(nodes, in_degree) do
