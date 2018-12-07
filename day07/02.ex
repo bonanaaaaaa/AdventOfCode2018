@@ -62,9 +62,6 @@ defmodule Logic do
   defp cal_in_degree(nodes, in_degree) do
     nodes |> Enum.reduce(in_degree, fn n, in_d -> Map.update!(in_d, n, &(&1 - 1)) end)
   end
-
-  defp cal_time() do
-  end
 end
 
 file_name = "input.txt"
@@ -80,6 +77,6 @@ File.stream!(file_name)
 |> Enum.reduce(%{}, fn {p, c}, g ->
   Map.update(g, p, {c}, &Tuple.append(&1, c))
 end)
-|> IO.inspect()
+# |> IO.inspect()
 |> Logic.sort()
 |> IO.inspect()
